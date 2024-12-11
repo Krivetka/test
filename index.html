@@ -1,40 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Heart Rate Playable Ad</title>
-<!--  <link rel="stylesheet" href="style.css">-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Motion</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .motion-container {
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .motion-value {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+    </style>
 </head>
 <body>
-<!--  &lt;!&ndash; Instruction Screen &ndash;&gt;-->
-<!--  <div id="instructionScreen" class="screen active">-->
-<!--    <h1>Check Your Heart Rate</h1>-->
-<!--    <img src="assets/icon_start.png" alt="Start Icon" class="icon">-->
-<!--    <p>Tap 'Start' and place your phone on your chest while lying down.</p>-->
-<!--    <button id="startButton" class="btn">Start</button>-->
-<!--  </div>-->
+    <div class="motion-container">
+        <h2>Device Motion Data</h2>
+        <div class="motion-value">X: <span id="accel-x">0</span> m/s<sup>2</sup></div>
+        <div class="motion-value">Y: <span id="accel-y">0</span> m/s<sup>2</sup></div>
+        <div class="motion-value">Z: <span id="accel-z">0</span> m/s<sup>2</sup></div>
+    </div>
 
-<!--  &lt;!&ndash; Detection Screen &ndash;&gt;-->
-<!--  <div id="detectionScreen" class="screen">-->
-<!--    <h1>Measuring...</h1>-->
-<!--    <p>Relax and breathe normally while we detect your heart rate.</p>-->
-<!--    <div class="loader"></div>-->
-<!--  </div>-->
+    <script>
+        if (window.DeviceMotionEvent) {
+            window.addEventListener("devicemotion", (event) => {
+                const x = event.acceleration.x ? event.acceleration.x.toFixed(2) : 0;
+                const y = event.acceleration.y ? event.acceleration.y.toFixed(2) : 0;
+                const z = event.acceleration.z ? event.acceleration.z.toFixed(2) : 0;
 
-<!--  &lt;!&ndash; Result Screen &ndash;&gt;-->
-<!--  <div id="resultScreen" class="screen">-->
-<!--    <h1>Your Heart Rate</h1>-->
-<!--    <div id="heartRate" class="rate">&#45;&#45; BPM</div>-->
-<!--    <p id="message"></p>-->
-<!--    <button id="downloadButton" class="btn">Download App</button>-->
-<!--  </div>-->
-
-  <script src="script.js"></script>
-<script>
-    window.addEventListener("devicemotion", (event) => {
-        alert(`${event.acceleration.x} m/s2`);
-    });
-</script>
+                document.getElementById("accel-x").textContent = x;
+                document.getElementById("accel-y").textContent = y;
+                document.getElementById("accel-z").textContent = z;
+            });
+        } else {
+            document.body.innerHTML = "<p>Device Motion is not supported on your device.</p>";
+        }
+    </script>
 </body>
 </html>

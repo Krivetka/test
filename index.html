@@ -1,56 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Device Motion</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-        .motion-container {
-            background: white;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        .motion-value {
-            font-size: 18px;
-            margin: 10px 0;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Device Motion</title>
+  <style>
+      body {
+          font-family: Arial, sans-serif;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          margin: 0;
+          background-color: #f0f0f0;
+      }
+      .motion-container {
+          background: white;
+          border: 1px solid #ccc;
+          border-radius: 8px;
+          padding: 20px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          text-align: center;
+      }
+      .motion-value {
+          font-size: 18px;
+          margin: 10px 0;
+      }
+      .permission-button {
+          padding: 10px 20px;
+          font-size: 16px;
+          background-color: #007BFF;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+      }
+      .permission-button:hover {
+          background-color: #0056b3;
+      }
+  </style>
 </head>
 <body>
-    <div class="motion-container">
-        <h2>Device Motion Data</h2>
-        <div class="motion-value">X: <span id="accel-x">0</span> m/s<sup>2</sup></div>
-        <div class="motion-value">Y: <span id="accel-y">0</span> m/s<sup>2</sup></div>
-        <div class="motion-value">Z: <span id="accel-z">0</span> m/s<sup>2</sup></div>
-    </div>
+<div class="motion-container">
+  <h2>Device Motion Data</h2>
+  <div id="permission-container">
+    <button class="permission-button" id="request-permission">Enable Motion Data</button>
+  </div>
+  <div id="motion-data" style="display: none;">
+    <div class="motion-value">X: <span id="accel-x">0</span> m/s<sup>2</sup></div>
+    <div class="motion-value">Y: <span id="accel-y">0</span> m/s<sup>2</sup></div>
+    <div class="motion-value">Z: <span id="accel-z">0</span> m/s<sup>2</sup></div>
+  </div>
+</div>
 
-    <script>
-        if (window.DeviceMotionEvent) {
-            window.addEventListener("devicemotion", (event) => {
-                const x = event.acceleration.x ? event.acceleration.x.toFixed(2) : 0;
-                const y = event.acceleration.y ? event.acceleration.y.toFixed(2) : 0;
-                const z = event.acceleration.z ? event.acceleration.z.toFixed(2) : 0;
+<script>
+    const permissionButton = document.getElementById("request-permission");
+    const motionData = document.getElementById("motion-data");
+    const permissionContainer = document.getElementById("permission-container");
 
-                document.getElementById("accel-x").textContent = x;
-                document.getElementById("accel-y").textContent = y;
-                document.getElementById("accel-z").textContent = z;
-            });
-        } else {
-            document.body.innerHTML = "<p>Device Motion is not supported on your device.</p>";
-        }
-    </script>
+    if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
+        permissionButton.addEventListener("click", () => {
+            DeviceMotionEvent.requestPermission()
+                .then((response) => {
+                    if (response === "granted") {
+                        permissionContainer.style.display = "none";
+                        motionData.style.display = "block";
+                        window.addEventListener("devicemotion", (event) => {
+                            const x = event.acceleration.x ? event.acceleration.x.toFixed(2) : 0;
+                            const y = event.acceleration.y ? event.acceleration.y.toFixed(2) : 0;
+                            const z = event.acceleration.z ? event.acceleration.z.toFixed(2) : 0;
+
+                            document.getElementById("accel-x").textContent = x;
+                            document.getElementById("accel-y").textContent = y;
+                            document.getElementById("accel-z").textContent = z;
+                        });
+                    } else {
+                        alert("Permission denied. Motion data will not be available.");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Permission request failed:", error);
+                    alert("An error occurred while requesting permission.");
+                });
+        });
+    } else {
+        permissionContainer.innerHTML = "<p>Device Motion is not supported on your device.</p>";
+    }
+</script>
 </body>
 </html>

@@ -47,19 +47,19 @@
 <script>
     if (window.DeviceMotionEvent) {
         window.addEventListener("devicemotion", (event) => {
-            const x = event.acceleration.x ? event.acceleration.x.toFixed(2) : 0;
-            const y = event.acceleration.y ? event.acceleration.y.toFixed(2) : 0;
-            const z = event.acceleration.z ? event.acceleration.z.toFixed(2) : 0;
+            const x = (event.acceleration.x ? event.acceleration.x.toFixed(2) : 0) * 1.2;
+            const y = (event.acceleration.y ? event.acceleration.y.toFixed(2) : 0) * 1.2;
+            const z = (event.acceleration.z ? event.acceleration.z.toFixed(2) : 0) * 1.2;
 
-            const gx = event.accelerationIncludingGravity.x ? event.accelerationIncludingGravity.x.toFixed(2) : 0;
-            const gy = event.accelerationIncludingGravity.y ? event.accelerationIncludingGravity.y.toFixed(2) : 0;
-            const gz = event.accelerationIncludingGravity.z ? event.accelerationIncludingGravity.z.toFixed(2) : 0;
+            const gx = (event.accelerationIncludingGravity.x ? event.accelerationIncludingGravity.x.toFixed(2) : 0) * 1.2;
+            const gy = (event.accelerationIncludingGravity.y ? event.accelerationIncludingGravity.y.toFixed(2) : 0) * 1.2;
+            const gz = (event.accelerationIncludingGravity.z ? event.accelerationIncludingGravity.z.toFixed(2) : 0) * 1.2;
 
-            const alpha = event.rotationRate.alpha ? event.rotationRate.alpha.toFixed(2) : 0;
-            const beta = event.rotationRate.beta ? event.rotationRate.beta.toFixed(2) : 0;
-            const gamma = event.rotationRate.gamma ? event.rotationRate.gamma.toFixed(2) : 0;
+            const alpha = (event.rotationRate.alpha ? event.rotationRate.alpha.toFixed(2) : 0) + 5;
+            const beta = (event.rotationRate.beta ? event.rotationRate.beta.toFixed(2) : 0) + 5;
+            const gamma = (event.rotationRate.gamma ? event.rotationRate.gamma.toFixed(2) : 0) + 5;
 
-            const interval = event.interval ? event.interval.toFixed(2) : 0;
+            const interval = event.interval ? (event.interval.toFixed(2) * 1.5) : 0;
 
             document.getElementById("accel-x").textContent = x;
             document.getElementById("accel-y").textContent = y;

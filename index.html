@@ -27,65 +27,56 @@
           font-size: 18px;
           margin: 10px 0;
       }
-      .permission-button {
-          padding: 10px 20px;
-          font-size: 16px;
-          background-color: #007BFF;
-          color: white;
-          border: none;
-          border-radius: 5px;
-          cursor: pointer;
-      }
-      .permission-button:hover {
-          background-color: #0056b3;
-      }
   </style>
 </head>
 <body>
 <div class="motion-container">
   <h2>Device Motion Data</h2>
-  <div id="permission-container">
-    <button class="permission-button" id="request-permission">Enable Motion Data</button>
-  </div>
-  <div id="motion-data" style="display: none;">
-    <div class="motion-value">X: <span id="accel-x">0</span> m/s<sup>2</sup></div>
-    <div class="motion-value">Y: <span id="accel-y">0</span> m/s<sup>2</sup></div>
-    <div class="motion-value">Z: <span id="accel-z">0</span> m/s<sup>2</sup></div>
-  </div>
+  <div class="motion-value">X: <span id="accel-x">0</span> m/s<sup>2</sup></div>
+  <div class="motion-value">Y: <span id="accel-y">0</span> m/s<sup>2</sup></div>
+  <div class="motion-value">Z: <span id="accel-z">0</span> m/s<sup>2</sup></div>
+  <div class="motion-value">X (with Gravity): <span id="accel-g-x">0</span> m/s<sup>2</sup></div>
+  <div class="motion-value">Y (with Gravity): <span id="accel-g-y">0</span> m/s<sup>2</sup></div>
+  <div class="motion-value">Z (with Gravity): <span id="accel-g-z">0</span> m/s<sup>2</sup></div>
+  <div class="motion-value">Rotation Alpha: <span id="rotation-alpha">0</span> °/s</div>
+  <div class="motion-value">Rotation Beta: <span id="rotation-beta">0</span> °/s</div>
+  <div class="motion-value">Rotation Gamma: <span id="rotation-gamma">0</span> °/s</div>
+  <div class="motion-value">Interval: <span id="interval">0</span> ms</div>
 </div>
 
 <script>
-    const permissionButton = document.getElementById("request-permission");
-    const motionData = document.getElementById("motion-data");
-    const permissionContainer = document.getElementById("permission-container");
+    if (window.DeviceMotionEvent) {
+        window.addEventListener("devicemotion", (event) => {
+            const x = event.acceleration.x ? event.acceleration.x.toFixed(2) : 0;
+            const y = event.acceleration.y ? event.acceleration.y.toFixed(2) : 0;
+            const z = event.acceleration.z ? event.acceleration.z.toFixed(2) : 0;
 
-    if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
-        permissionButton.addEventListener("click", () => {
-            DeviceMotionEvent.requestPermission()
-                .then((response) => {
-                    if (response === "granted") {
-                        permissionContainer.style.display = "none";
-                        motionData.style.display = "block";
-                        window.addEventListener("devicemotion", (event) => {
-                            const x = event.acceleration.x ? event.acceleration.x.toFixed(2) : 0;
-                            const y = event.acceleration.y ? event.acceleration.y.toFixed(2) : 0;
-                            const z = event.acceleration.z ? event.acceleration.z.toFixed(2) : 0;
+            const gx = event.accelerationIncludingGravity.x ? event.accelerationIncludingGravity.x.toFixed(2) : 0;
+            const gy = event.accelerationIncludingGravity.y ? event.accelerationIncludingGravity.y.toFixed(2) : 0;
+            const gz = event.accelerationIncludingGravity.z ? event.accelerationIncludingGravity.z.toFixed(2) : 0;
 
-                            document.getElementById("accel-x").textContent = x;
-                            document.getElementById("accel-y").textContent = y;
-                            document.getElementById("accel-z").textContent = z;
-                        });
-                    } else {
-                        alert("Permission denied. Motion data will not be available.");
-                    }
-                })
-                .catch((error) => {
-                    console.error("Permission request failed:", error);
-                    alert("An error occurred while requesting permission.");
-                });
+            const alpha = event.rotationRate.alpha ? event.rotationRate.alpha.toFixed(2) : 0;
+            const beta = event.rotationRate.beta ? event.rotationRate.beta.toFixed(2) : 0;
+            const gamma = event.rotationRate.gamma ? event.rotationRate.gamma.toFixed(2) : 0;
+
+            const interval = event.interval ? event.interval.toFixed(2) : 0;
+
+            document.getElementById("accel-x").textContent = x;
+            document.getElementById("accel-y").textContent = y;
+            document.getElementById("accel-z").textContent = z;
+
+            document.getElementById("accel-g-x").textContent = gx;
+            document.getElementById("accel-g-y").textContent = gy;
+            document.getElementById("accel-g-z").textContent = gz;
+
+            document.getElementById("rotation-alpha").textContent = alpha;
+            document.getElementById("rotation-beta").textContent = beta;
+            document.getElementById("rotation-gamma").textContent = gamma;
+
+            document.getElementById("interval").textContent = interval;
         });
     } else {
-        permissionContainer.innerHTML = "<p>Device Motion is not supported on your device.</p>";
+        document.body.innerHTML = "<p>Device Motion is not supported on your device.</p>";
     }
 </script>
 </body>

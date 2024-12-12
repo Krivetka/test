@@ -30,54 +30,93 @@
   </style>
 </head>
 <body>
-<div class="motion-container">
-  <h2>Device Motion Data</h2>
-  <div class="motion-value">X: <span id="accel-x">0</span> m/s<sup>2</sup></div>
-  <div class="motion-value">Y: <span id="accel-y">0</span> m/s<sup>2</sup></div>
-  <div class="motion-value">Z: <span id="accel-z">0</span> m/s<sup>2</sup></div>
-  <div class="motion-value">X (with Gravity): <span id="accel-g-x">0</span> m/s<sup>2</sup></div>
-  <div class="motion-value">Y (with Gravity): <span id="accel-g-y">0</span> m/s<sup>2</sup></div>
-  <div class="motion-value">Z (with Gravity): <span id="accel-g-z">0</span> m/s<sup>2</sup></div>
-  <div class="motion-value">Rotation Alpha: <span id="rotation-alpha">0</span> °/s</div>
-  <div class="motion-value">Rotation Beta: <span id="rotation-beta">0</span> °/s</div>
-  <div class="motion-value">Rotation Gamma: <span id="rotation-gamma">0</span> °/s</div>
-  <div class="motion-value">Interval: <span id="interval">0</span> ms</div>
-</div>
+<table>
+  <tr>
+    <td>API used</td>
+    <td id="moApi"></td>
+  </tr>
+  <tr>
+    <td>linear acceleration (excl. gravity)</td>
+    <td id="moAccel"></td>
+  </tr>
+  <tr>
+    <td>acceleration incl. gravity</td>
+    <td id="moAccelGrav"></td>
+  </tr>
+  <tr>
+    <td>rotation rate</td>
+    <td id="moRotation"></td>
+  </tr>
+  <tr>
+    <td>interval (ms)</td>
+    <td id="moInterval"></td>
+  </tr>
+</table>
+
 
 <script>
-    if (window.DeviceMotionEvent) {
-        window.addEventListener("devicemotion", (event) => {
-            const x = (event.acceleration.x ? event.acceleration.x.toFixed(2) : 0) * 1.2;
-            const y = (event.acceleration.y ? event.acceleration.y.toFixed(2) : 0) * 1.2;
-            const z = (event.acceleration.z ? event.acceleration.z.toFixed(2) : 0) * 1.2;
+    if ('LinearAccelerationSensor' in window && 'Gyroscope' in window) {
+        document.getElementById('moApi').innerHTML = 'Generic Sensor API';
 
-            const gx = (event.accelerationIncludingGravity.x ? event.accelerationIncludingGravity.x.toFixed(2) : 0) * 1.2;
-            const gy = (event.accelerationIncludingGravity.y ? event.accelerationIncludingGravity.y.toFixed(2) : 0) * 1.2;
-            const gz = (event.accelerationIncludingGravity.z ? event.accelerationIncludingGravity.z.toFixed(2) : 0) * 1.2;
-
-            const alpha = (event.rotationRate.alpha ? event.rotationRate.alpha.toFixed(2) : 0) + 5;
-            const beta = (event.rotationRate.beta ? event.rotationRate.beta.toFixed(2) : 0) + 5;
-            const gamma = (event.rotationRate.gamma ? event.rotationRate.gamma.toFixed(2) : 0) + 5;
-
-            const interval = event.interval ? (event.interval.toFixed(2) * 1.5) : 0;
-
-            document.getElementById("accel-x").textContent = x;
-            document.getElementById("accel-y").textContent = y;
-            document.getElementById("accel-z").textContent = z;
-
-            document.getElementById("accel-g-x").textContent = gx;
-            document.getElementById("accel-g-y").textContent = gy;
-            document.getElementById("accel-g-z").textContent = gz;
-
-            document.getElementById("rotation-alpha").textContent = alpha;
-            document.getElementById("rotation-beta").textContent = beta;
-            document.getElementById("rotation-gamma").textContent = gamma;
-
-            document.getElementById("interval").textContent = interval;
+        let lastReadingTimestamp;
+        let accelerometer = new LinearAccelerationSensor();
+        accelerometer.addEventListener('reading', e => {
+            if (lastReadingTimestamp) {
+                intervalHandler(Math.round(accelerometer.timestamp - lastReadingTimestamp));
+            }
+            lastReadingTimestamp = accelerometer.timestamp
+            accelerationHandler(accelerometer, 'moAccel');
         });
+        accelerometer.start();
+
+        if ('GravitySensor' in window) {
+            let gravity = new GravitySensor();
+            gravity.addEventListener('reading', e => accelerationHandler(gravity, 'moAccelGrav'));
+            gravity.start();
+        }
+
+        let gyroscope = new Gyroscope();
+        gyroscope.addEventListener('reading', e => rotationHandler({
+            alpha: gyroscope.x,
+            beta: gyroscope.y,
+            gamma: gyroscope.z
+        }));
+        gyroscope.start();
+
+    } else if ('DeviceMotionEvent' in window) {
+        document.getElementById('moApi').innerHTML = 'Device Motion API';
+
+        var onDeviceMotion = function (eventData) {
+            accelerationHandler(eventData.acceleration, 'moAccel');
+            accelerationHandler(eventData.accelerationIncludingGravity, 'moAccelGrav');
+            rotationHandler(eventData.rotationRate);
+            intervalHandler(eventData.interval);
+        }
+
+        window.addEventListener('devicemotion', onDeviceMotion, false);
     } else {
-        document.body.innerHTML = "<p>Device Motion is not supported on your device.</p>";
+        document.getElementById('moApi').innerHTML = 'No Accelerometer & Gyroscope API available';
     }
+
+    function accelerationHandler(acceleration, targetId) {
+        var info, xyz = "[X, Y, Z]";
+
+        info = xyz.replace("X", acceleration.x && acceleration.x.toFixed(3));
+        info = info.replace("Y", acceleration.y && acceleration.y.toFixed(3));
+        info = info.replace("Z", acceleration.z && acceleration.z.toFixed(3));
+        document.getElementById(targetId).innerHTML = info;
+    }
+
+    function rotationHandler(rotation) {
+        var info, xyz = "[X, Y, Z]";
+
+        info = xyz.replace("X", rotation.alpha && rotation.alpha.toFixed(3));
+        info = info.replace("Y", rotation.beta && rotation.beta.toFixed(3));
+        info = info.replace("Z", rotation.gamma && rotation.gamma.toFixed(3));
+        document.getElementById("moRotation").innerHTML = info;
+    }
+
+
 </script>
 </body>
 </html>

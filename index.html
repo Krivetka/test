@@ -3,120 +3,144 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Device Motion</title>
-  <style>
-      body {
-          font-family: Arial, sans-serif;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          height: 100vh;
-          margin: 0;
-          background-color: #f0f0f0;
-      }
-      .motion-container {
-          background: white;
-          border: 1px solid #ccc;
-          border-radius: 8px;
-          padding: 20px;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-          text-align: center;
-      }
-      .motion-value {
-          font-size: 18px;
-          margin: 10px 0;
-      }
-  </style>
+  <title>Heartbeat Detection</title>
 </head>
 <body>
-<table>
-  <tr>
-    <td>API used</td>
-    <td id="moApi"></td>
-  </tr>
-  <tr>
-    <td>linear acceleration (excl. gravity)</td>
-    <td id="moAccel"></td>
-  </tr>
-  <tr>
-    <td>acceleration incl. gravity</td>
-    <td id="moAccelGrav"></td>
-  </tr>
-  <tr>
-    <td>rotation rate</td>
-    <td id="moRotation"></td>
-  </tr>
-  <tr>
-    <td>interval (ms)</td>
-    <td id="moInterval"></td>
-  </tr>
-</table>
-
+<div style="text-align:center; font-family: Arial, sans-serif;">
+    <h1>Heartbeat Detection</h1>
+    <p>Press the button below to begin measurement.</p>
+    <button id="startButton" style="font-size:16px; padding:10px 20px;">Start Measurement</button>
+    <p id="status">Waiting for input...</p>
+    <p id="result" style="font-weight:bold; font-size:18px;"></p>
+    <button id="ctaButton" style="display:none; font-size:16px; padding:10px 20px; margin-top:20px;">Install Full Version</button>
+</div>
 
 <script>
-    if ('LinearAccelerationSensor' in window && 'Gyroscope' in window) {
-        document.getElementById('moApi').innerHTML = 'Generic Sensor API';
+    // Constants and Variables
+    const SAMPLING_RATE = 100; 
+    const MIN_PEAK_INTERVAL = 600; 
+    const THRESHOLD_FACTOR = 1.5; 
+    const TARGET_HEARTBEATS = 10;
 
-        let lastReadingTimestamp;
-        let accelerometer = new LinearAccelerationSensor();
-        accelerometer.addEventListener('reading', e => {
-            if (lastReadingTimestamp) {
-                intervalHandler(Math.round(accelerometer.timestamp - lastReadingTimestamp));
+    let dataBuffer = [];
+    let timestamps = [];
+    let lastPeakTime = 0;
+    let peakTimestamps = [];
+    let measurementStarted = false;
+    let heartbeatCount = 0;
+
+    // Audio Elements
+    const beepSound = new Audio('beep.mp3');
+    const fanfareSound = new Audio('fanfare.mp3');
+
+    const startButton = document.getElementById('startButton');
+    const statusText = document.getElementById('status');
+    const resultText = document.getElementById('result');
+    const ctaButton = document.getElementById('ctaButton');
+
+    // Request Permission and Start Measurement
+    startButton.addEventListener('click', async () => {
+        try {
+            if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                const permission = await DeviceMotionEvent.requestPermission();
+                if (permission !== 'granted') {
+                    alert('Permission denied. Please enable motion access.');
+                    return;
+                }
             }
-            lastReadingTimestamp = accelerometer.timestamp
-            accelerationHandler(accelerometer, 'moAccel');
+            checkAudio();
+        } catch (error) {
+            console.error('Error:', error);
+            statusText.textContent = 'Error starting measurement. Try again.';
+        }
+    });
+
+    // Check if audio is enabled
+    function checkAudio() {
+        beepSound.play().then(() => {
+            startMeasurement();
+        }).catch(() => {
+            alert('Please enable sound on your device to continue.');
         });
-        accelerometer.start();
+    }
 
-        if ('GravitySensor' in window) {
-            let gravity = new GravitySensor();
-            gravity.addEventListener('reading', e => accelerationHandler(gravity, 'moAccelGrav'));
-            gravity.start();
+    // Start Measurement Process
+    function startMeasurement() {
+        if (window.DeviceMotionEvent) {
+            statusText.textContent = 'Measuring... Please hold your phone still.';
+            window.addEventListener('devicemotion', handleMotion);
+            heartbeatCount = 0;
+            peakTimestamps = [];
+            measurementStarted = true;
+        } else {
+            statusText.textContent = 'DeviceMotionEvent is not supported on this device.';
+        }
+    }
+
+    // Handle Motion Data
+    function handleMotion(event) {
+        const z = event.accelerationIncludingGravity.z;
+        const currentTime = Date.now();
+        dataBuffer.push(z);
+        timestamps.push(currentTime);
+
+        if (dataBuffer.length > SAMPLING_RATE) {
+            dataBuffer.shift();
+            timestamps.shift();
         }
 
-        let gyroscope = new Gyroscope();
-        gyroscope.addEventListener('reading', e => rotationHandler({
-            alpha: gyroscope.x,
-            beta: gyroscope.y,
-            gamma: gyroscope.z
-        }));
-        gyroscope.start();
+        if (measurementStarted) {
+            detectPeaks(z, currentTime);
+        }
+    }
 
-    } else if ('DeviceMotionEvent' in window) {
-        document.getElementById('moApi').innerHTML = 'Device Motion API';
+    // Detect Peaks and Count Heartbeats
+    function detectPeaks(currentValue, currentTime) {
+        const windowSize = Math.min(dataBuffer.length, Math.floor(SAMPLING_RATE / 2));
+        if (windowSize < 2) return;
 
-        var onDeviceMotion = function (eventData) {
-            accelerationHandler(eventData.acceleration, 'moAccel');
-            accelerationHandler(eventData.accelerationIncludingGravity, 'moAccelGrav');
-            rotationHandler(eventData.rotationRate);
-            intervalHandler(eventData.interval);
+        const recentValues = dataBuffer.slice(-windowSize);
+        const mean = recentValues.reduce((a, b) => a + b, 0) / windowSize;
+        const stdDev = Math.sqrt(recentValues.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b, 0) / windowSize);
+        const threshold = mean + THRESHOLD_FACTOR * stdDev;
+
+        if (currentValue > threshold && currentTime - lastPeakTime > MIN_PEAK_INTERVAL) {
+            lastPeakTime = currentTime;
+            beepSound.play();
+            peakTimestamps.push(currentTime);
+            heartbeatCount++;
+            if (heartbeatCount >= TARGET_HEARTBEATS) {
+                completeMeasurement();
+            }
+        }
+    }
+
+    // Complete Measurement and Calculate Pulse
+    function completeMeasurement() {
+        window.removeEventListener('devicemotion', handleMotion);
+        measurementStarted = false;
+        fanfareSound.play();
+
+        const last5Intervals = [];
+        for (let i = peakTimestamps.length - 1; i > 0 && last5Intervals.length < 5; i--) {
+            last5Intervals.push(peakTimestamps[i] - peakTimestamps[i - 1]);
         }
 
-        window.addEventListener('devicemotion', onDeviceMotion, false);
-    } else {
-        document.getElementById('moApi').innerHTML = 'No Accelerometer & Gyroscope API available';
+        const avgInterval = last5Intervals.reduce((a, b) => a + b, 0) / last5Intervals.length;
+        const pulse = Math.round(60000 / avgInterval);
+
+        statusText.textContent = 'Measurement Complete!';
+        resultText.textContent = `Your heart rate is approximately ${pulse} BPM.`;
+        showCTA();
     }
 
-    function accelerationHandler(acceleration, targetId) {
-        var info, xyz = "[X, Y, Z]";
-
-        info = xyz.replace("X", acceleration.x && acceleration.x.toFixed(3));
-        info = info.replace("Y", acceleration.y && acceleration.y.toFixed(3));
-        info = info.replace("Z", acceleration.z && acceleration.z.toFixed(3));
-        document.getElementById(targetId).innerHTML = info;
+    // Show Call-To-Action Button
+    function showCTA() {
+        ctaButton.style.display = 'inline-block';
+        ctaButton.addEventListener('click', () => {
+            alert('Redirecting to the app store for full version...');
+        });
     }
-
-    function rotationHandler(rotation) {
-        var info, xyz = "[X, Y, Z]";
-
-        info = xyz.replace("X", rotation.alpha && rotation.alpha.toFixed(3));
-        info = info.replace("Y", rotation.beta && rotation.beta.toFixed(3));
-        info = info.replace("Z", rotation.gamma && rotation.gamma.toFixed(3));
-        document.getElementById("moRotation").innerHTML = info;
-    }
-
-
 </script>
 </body>
 </html>

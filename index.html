@@ -12,6 +12,7 @@
   <button id="startButton" style="font-size:16px; padding:10px 20px;">Start Measurement</button>
   <p id="status">Waiting for input...</p>
   <p id="result" style="font-weight:bold; font-size:18px;"></p>
+  <p id="debug" style="text-align:left; font-family:monospace; white-space:pre-wrap;"></p>
   <button id="ctaButton" style="display:none; font-size:16px; padding:10px 20px; margin-top:20px;">Install Full Version</button>
 </div>
 
@@ -29,6 +30,8 @@
     let measurementStarted = false;
     let heartbeatCount = 0;
 
+    const debugElement = document.getElementById('debug');
+    
     // Audio Elements
     const beepSound = new Audio('https://www.soundjay.com/buttons/sounds/beep-07a.mp3');
     const fanfareSound = new Audio('https://www.soundjay.com/buttons/sounds/beep-01a.mp3');
@@ -48,9 +51,11 @@
                     return;
                 }
             }
+            logDebug('Audio check started.');
             checkAudio();
         } catch (error) {
             console.error('Error:', error);
+            logDebug('Error: ' + error.message);
             statusText.textContent = 'Error starting measurement. Try again.';
         }
     });
@@ -58,8 +63,10 @@
     // Check if audio is enabled
     function checkAudio() {
         beepSound.play().then(() => {
+            logDebug('Audio enabled. Starting measurement.');
             startMeasurement();
         }).catch(() => {
+            logDebug('Audio check failed: sound is disabled.');
             alert('Please enable sound on your device to continue.');
         });
     }
@@ -68,12 +75,14 @@
     function startMeasurement() {
         if (window.DeviceMotionEvent) {
             statusText.textContent = 'Measuring... Please hold your phone still.';
+            logDebug('Measurement started. DeviceMotionEvent supported.');
             window.addEventListener('devicemotion', handleMotion);
             heartbeatCount = 0;
             peakTimestamps = [];
             measurementStarted = true;
         } else {
             statusText.textContent = 'DeviceMotionEvent is not supported on this device.';
+            logDebug('DeviceMotionEvent not supported on this device.');
         }
     }
 
@@ -88,6 +97,8 @@
             dataBuffer.shift();
             timestamps.shift();
         }
+
+        logDebug(`Motion Data: z=${z.toFixed(3)}, time=${currentTime}`);
 
         if (measurementStarted) {
             detectPeaks(z, currentTime);
@@ -104,11 +115,14 @@
         const stdDev = Math.sqrt(recentValues.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b, 0) / windowSize);
         const threshold = mean + THRESHOLD_FACTOR * stdDev;
 
+        logDebug(`Threshold: ${threshold.toFixed(3)}, Current Value: ${currentValue.toFixed(3)}`);
+
         if (currentValue > threshold && currentTime - lastPeakTime > MIN_PEAK_INTERVAL) {
             lastPeakTime = currentTime;
             beepSound.play();
             peakTimestamps.push(currentTime);
             heartbeatCount++;
+            logDebug(`Peak detected! Heartbeat count: ${heartbeatCount}`);
             if (heartbeatCount >= TARGET_HEARTBEATS) {
                 completeMeasurement();
             }
@@ -120,6 +134,7 @@
         window.removeEventListener('devicemotion', handleMotion);
         measurementStarted = false;
         fanfareSound.play();
+        logDebug('Measurement complete. Calculating pulse.');
 
         const last5Intervals = [];
         for (let i = peakTimestamps.length - 1; i > 0 && last5Intervals.length < 5; i--) {
@@ -131,6 +146,7 @@
 
         statusText.textContent = 'Measurement Complete!';
         resultText.textContent = `Your heart rate is approximately ${pulse} BPM.`;
+        logDebug(`Pulse: ${pulse} BPM (based on last 5 intervals).`);
         showCTA();
     }
 
@@ -138,8 +154,15 @@
     function showCTA() {
         ctaButton.style.display = 'inline-block';
         ctaButton.addEventListener('click', () => {
+            logDebug('CTA button clicked: Redirecting to app store.');
             alert('Redirecting to the app store for full version...');
         });
+    }
+
+    // Log Debug Information
+    function logDebug(message) {
+        console.log(message);
+        debugElement.textContent += message + '\n';
     }
 </script>
 </body>

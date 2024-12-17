@@ -100,15 +100,22 @@
 
     // Handle Motion Data
     function handleMotion(event) {
-        motionDataReceived = true; // Данные получены
+        motionDataReceived = true; // Маркируем, что данные приходят
+
         const accel = event.acceleration || { x: 0, y: 0, z: 0 };
         const accelWithGravity = event.accelerationIncludingGravity || { x: 0, y: 0, z: 0 };
 
-        const z = accelWithGravity.z || 0;
         const x = accelWithGravity.x || 0;
         const y = accelWithGravity.y || 0;
+        const z = accelWithGravity.z || 0;
 
         const currentTime = Date.now();
+
+        // Логирование всех осей для отладки
+        logDebug(`Acceleration: x=${accel.x?.toFixed(3)}, y=${accel.y?.toFixed(3)}, z=${accel.z?.toFixed(3)}`);
+        logDebug(`Gravity Incl.: x=${x.toFixed(3)}, y=${y.toFixed(3)}, z=${z.toFixed(3)}, time=${currentTime}`);
+
+        // Добавление данных в буфер
         dataBuffer.push(z);
         timestamps.push(currentTime);
 
@@ -117,13 +124,12 @@
             timestamps.shift();
         }
 
-        // Логируем все оси для диагностики
-        logDebug(`Motion Data: x=${x.toFixed(3)}, y=${y.toFixed(3)}, z=${z.toFixed(3)}, time=${currentTime}`);
-
+        // Запуск пикового детектора по оси z
         if (measurementStarted) {
             detectPeaks(z, currentTime);
         }
     }
+
 
 
     // Detect Peaks and Count Heartbeats

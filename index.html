@@ -32,7 +32,7 @@
     let motionDataReceived = false; // Flag to check if data is received
 
     const debugElement = document.getElementById('debug');
-    
+
     // Audio Elements
     const beepSound = new Audio('https://www.soundjay.com/buttons/sounds/beep-07a.mp3');
     const fanfareSound = new Audio('https://www.soundjay.com/buttons/sounds/beep-01a.mp3');
@@ -100,8 +100,14 @@
 
     // Handle Motion Data
     function handleMotion(event) {
-        motionDataReceived = true; // Mark that motion data is being received
-        const z = event.accelerationIncludingGravity.z || 0;
+        motionDataReceived = true; // Данные получены
+        const accel = event.acceleration || { x: 0, y: 0, z: 0 };
+        const accelWithGravity = event.accelerationIncludingGravity || { x: 0, y: 0, z: 0 };
+
+        const z = accelWithGravity.z || 0;
+        const x = accelWithGravity.x || 0;
+        const y = accelWithGravity.y || 0;
+
         const currentTime = Date.now();
         dataBuffer.push(z);
         timestamps.push(currentTime);
@@ -111,12 +117,14 @@
             timestamps.shift();
         }
 
-        logDebug(`Motion Data: z=${z.toFixed(3)}, time=${currentTime}`);
+        // Логируем все оси для диагностики
+        logDebug(`Motion Data: x=${x.toFixed(3)}, y=${y.toFixed(3)}, z=${z.toFixed(3)}, time=${currentTime}`);
 
         if (measurementStarted) {
             detectPeaks(z, currentTime);
         }
     }
+
 
     // Detect Peaks and Count Heartbeats
     function detectPeaks(currentValue, currentTime) {

@@ -7,19 +7,19 @@
 </head>
 <body>
 <div style="text-align:center; font-family: Arial, sans-serif;">
-    <h1>Heartbeat Detection</h1>
-    <p>Press the button below to begin measurement.</p>
-    <button id="startButton" style="font-size:16px; padding:10px 20px;">Start Measurement</button>
-    <p id="status">Waiting for input...</p>
-    <p id="result" style="font-weight:bold; font-size:18px;"></p>
-    <button id="ctaButton" style="display:none; font-size:16px; padding:10px 20px; margin-top:20px;">Install Full Version</button>
+  <h1>Heartbeat Detection</h1>
+  <p>Press the button below to begin measurement.</p>
+  <button id="startButton" style="font-size:16px; padding:10px 20px;">Start Measurement</button>
+  <p id="status">Waiting for input...</p>
+  <p id="result" style="font-weight:bold; font-size:18px;"></p>
+  <button id="ctaButton" style="display:none; font-size:16px; padding:10px 20px; margin-top:20px;">Install Full Version</button>
 </div>
 
 <script>
     // Constants and Variables
-    const SAMPLING_RATE = 100; 
-    const MIN_PEAK_INTERVAL = 600; 
-    const THRESHOLD_FACTOR = 1.5; 
+    const SAMPLING_RATE = 100;
+    const MIN_PEAK_INTERVAL = 600;
+    const THRESHOLD_FACTOR = 1.5;
     const TARGET_HEARTBEATS = 10;
 
     let dataBuffer = [];
@@ -30,8 +30,8 @@
     let heartbeatCount = 0;
 
     // Audio Elements
-    const beepSound = new Audio('beep.mp3');
-    const fanfareSound = new Audio('fanfare.mp3');
+    const beepSound = new Audio('https://www.soundjay.com/buttons/sounds/beep-07a.mp3');
+    const fanfareSound = new Audio('https://www.soundjay.com/buttons/sounds/beep-01a.mp3');
 
     const startButton = document.getElementById('startButton');
     const statusText = document.getElementById('status');

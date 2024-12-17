@@ -29,6 +29,7 @@
     let peakTimestamps = [];
     let measurementStarted = false;
     let heartbeatCount = 0;
+    let motionDataReceived = false; // Flag to check if data is received
 
     const debugElement = document.getElementById('debug');
     
@@ -80,15 +81,27 @@
             heartbeatCount = 0;
             peakTimestamps = [];
             measurementStarted = true;
+            setTimeout(checkMotionTimeout, 3000); // Check after 3s if data is received
         } else {
             statusText.textContent = 'DeviceMotionEvent is not supported on this device.';
             logDebug('DeviceMotionEvent not supported on this device.');
         }
     }
 
+    // Check if motion data is received
+    function checkMotionTimeout() {
+        if (!motionDataReceived) {
+            window.removeEventListener('devicemotion', handleMotion);
+            measurementStarted = false;
+            statusText.textContent = 'No motion data detected. Please try again.';
+            logDebug('No motion data received after 3 seconds.');
+        }
+    }
+
     // Handle Motion Data
     function handleMotion(event) {
-        const z = event.accelerationIncludingGravity.z;
+        motionDataReceived = true; // Mark that motion data is being received
+        const z = event.accelerationIncludingGravity.z || 0;
         const currentTime = Date.now();
         dataBuffer.push(z);
         timestamps.push(currentTime);

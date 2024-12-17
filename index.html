@@ -12,6 +12,7 @@
   <button id="startButton" style="font-size:16px; padding:10px 20px;">Start Measurement</button>
   <p id="status">Waiting for input...</p>
   <p id="result" style="font-weight:bold; font-size:18px;"></p>
+  <p id="motionData" style="font-size:14px; text-align:left; font-family:monospace; white-space:pre-wrap; margin:10px 20px; background:#f0f0f0; padding:10px; border-radius:5px;">Motion Data will appear here...</p>
   <p id="debug" style="text-align:left; font-family:monospace; white-space:pre-wrap;"></p>
   <button id="ctaButton" style="display:none; font-size:16px; padding:10px 20px; margin-top:20px;">Install Full Version</button>
 </div>
@@ -32,6 +33,7 @@
     let motionDataReceived = false; // Flag to check if data is received
 
     const debugElement = document.getElementById('debug');
+    const motionDataElement = document.getElementById('motionData');
 
     // Audio Elements
     const beepSound = new Audio('https://www.soundjay.com/buttons/sounds/beep-07a.mp3');
@@ -100,7 +102,7 @@
 
     // Handle Motion Data
     function handleMotion(event) {
-        motionDataReceived = true; // Маркируем, что данные приходят
+        motionDataReceived = true; // Mark that motion data is being received
 
         const accel = event.acceleration || { x: 0, y: 0, z: 0 };
         const accelWithGravity = event.accelerationIncludingGravity || { x: 0, y: 0, z: 0 };
@@ -111,11 +113,19 @@
 
         const currentTime = Date.now();
 
-        // Логирование всех осей для отладки
-        logDebug(`Acceleration: x=${accel.x?.toFixed(3)}, y=${accel.y?.toFixed(3)}, z=${accel.z?.toFixed(3)}`);
-        logDebug(`Gravity Incl.: x=${x.toFixed(3)}, y=${y.toFixed(3)}, z=${z.toFixed(3)}, time=${currentTime}`);
+        // Display all axes data in HTML
+        motionDataElement.textContent = `Motion Data:
+Acceleration (no gravity):
+  x: ${accel.x?.toFixed(3)} m/s²
+  y: ${accel.y?.toFixed(3)} m/s²
+  z: ${accel.z?.toFixed(3)} m/s²
+Acceleration with Gravity:
+  x: ${x.toFixed(3)} m/s²
+  y: ${y.toFixed(3)} m/s²
+  z: ${z.toFixed(3)} m/s²
+Timestamp: ${currentTime}`;
 
-        // Добавление данных в буфер
+        // Update buffer and timestamps for peak detection
         dataBuffer.push(z);
         timestamps.push(currentTime);
 
@@ -124,13 +134,12 @@
             timestamps.shift();
         }
 
-        // Запуск пикового детектора по оси z
+        logDebug(`Motion Data: x=${x.toFixed(3)}, y=${y.toFixed(3)}, z=${z.toFixed(3)}, time=${currentTime}`);
+
         if (measurementStarted) {
             detectPeaks(z, currentTime);
         }
     }
-
-
 
     // Detect Peaks and Count Heartbeats
     function detectPeaks(currentValue, currentTime) {

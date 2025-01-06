@@ -21,10 +21,37 @@
           padding: 28px;
           background-size: cover;
           background-color: #000000;
-          background-image: url("assets/heart.png");
           background-repeat: no-repeat;
           background-position: top;
       }
+
+      .background-image {
+          position: fixed;
+          top: -8%;
+          left: 0;
+          width: 100vw;
+          opacity: 1;
+          z-index: -1;
+      }
+
+      .background-image.animated {
+          top: 4%;
+          animation: fadeInOut 4s ease-in-out infinite;
+      }
+
+      @keyframes fadeInOut {
+          0% {
+              opacity: 0.8;
+          } 
+          50% {
+              opacity: 0.5;
+          }
+          100% {
+              opacity: 0.8;
+          }
+      }
+
+
 
       .text {
           color: #ffffff;
@@ -152,11 +179,11 @@
           background: rgba(255, 255, 255, 0.10);
           backdrop-filter: blur(20px);
           z-index: 10;
-          transition: all 3s ease-in-out;
+          transition: all 2s ease-in-out;
       }
 
       .pop-up.visible {
-          bottom: 12px;
+          bottom: 16px;
       }
 
       .info {
@@ -387,6 +414,7 @@
 <div class="logo"><img src="assets/logo.svg" alt="logo" class="logo-image">
   <p class="logo-text text">Heart Scan</p></div>
 <div class="app">
+  <img src="assets/heart.png" alt="Background" class="background-image">
   <div class="disclaimer">
     <img src="assets/clock.svg" alt="clock" class="disclaimer-image">
     <p class="disclaimer-text text">Takes 10 sec</p>
@@ -472,6 +500,7 @@
 
     const updateMeasurementDisplay = () => {
         app.innerHTML = `
+<img src="assets/heart.png" alt="Background" class="background-image">
         <div class="heart-rate">
             <p class="heart-rate-text text">In process... <span class="heart-rate-number text">9</span></p>
             <p class="heart-rate-value text">--</p>
@@ -512,6 +541,11 @@
             </div>
         </div>`;
         document.body.style.backgroundImage = "none";
+        const backgroundImage = document.querySelector('.background-image');
+        if (backgroundImage) {
+            backgroundImage.classList.add('animated');
+        }
+
     };
 
     const startMeasurement = () => {
@@ -607,7 +641,7 @@
 
     const checkAppLaunch = () => {
         if (!isAppLaunched) {
-            document.body.innerHTML += `
+            app.innerHTML += `
         <div class="pop-up-background"></div>
         <div class="pop-up">
             <div class="info">

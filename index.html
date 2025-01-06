@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Heart Scan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
   <style>
       * {
           padding: 0;
@@ -25,7 +28,7 @@
 
       .text {
           color: #ffffff;
-          font-family: Roboto, sans-serif;
+          font-family: "Roboto", sans-serif;
           font-style: normal;
       }
 
@@ -107,7 +110,7 @@
           background: #FFF;
           color: #000;
           text-align: center;
-          font-family: Roboto, serif;
+          font-family: "Roboto", sans-serif;
           font-size: 24px;
           font-style: normal;
           font-weight: 700;
@@ -138,7 +141,7 @@
 
       .pop-up {
           position: fixed;
-          bottom: 12px;
+          bottom: -100%;
           left: 20px;
           display: flex;
           justify-content: space-between;
@@ -149,6 +152,11 @@
           background: rgba(255, 255, 255, 0.10);
           backdrop-filter: blur(20px);
           z-index: 10;
+          transition: all 3s ease-in-out;
+      }
+
+      .pop-up.visible {
+          bottom: 12px;
       }
 
       .info {
@@ -227,7 +235,14 @@
           background-position: bottom;
           background-repeat: no-repeat;
           z-index: -10;
+          opacity: 0;
+          transition: opacity 2s ease-in-out;
       }
+
+      .pop-up-background.visible {
+          opacity: 1;
+      }
+
 
       .instruction-text {
           margin-top: 68px;
@@ -372,23 +387,23 @@
 <div class="logo"><img src="assets/logo.svg" alt="logo" class="logo-image">
   <p class="logo-text text">Heart Scan</p></div>
 <div class="app">
-    <div class="disclaimer">
-      <img src="assets/clock.svg" alt="clock" class="disclaimer-image">
-      <p class="disclaimer-text text">Takes 10 sec</p>
-    </div>
-    <h1 class="title text">Check Your Heart Rate on This Screen</h1>
-    <div class="instruction">
-      <img src="assets/boy.jpg" alt="Boy" class="instruction-image">
-      <button class="instruction-button" type="button" onclick="startApp()">
-        Start now
-      </button>
-      <img src="assets/hand.png" alt="Pointer" class="instruction-pointer">
-    </div>
+  <div class="disclaimer">
+    <img src="assets/clock.svg" alt="clock" class="disclaimer-image">
+    <p class="disclaimer-text text">Takes 10 sec</p>
+  </div>
+  <h1 class="title text">Check Your Heart Rate on This Screen</h1>
+  <div class="instruction">
+    <img src="assets/boy.jpg" alt="Boy" class="instruction-image">
+    <button class="instruction-button" type="button" onclick="startApp()">
+      Start now
+    </button>
+    <img src="assets/hand.png" alt="Pointer" class="instruction-pointer">
+  </div>
 </div>
 
 
 <script>
-    const TIMER_DURATION = 10000;
+    const TIMER_DURATION = 8000;
     const START_COUNT = 1;
 
     const SAMPLING_RATE = 100;
@@ -422,7 +437,8 @@
                 }
             }
             showInstruction();
-        } catch (error) {}
+        } catch (error) {
+        }
     };
 
     const showInstruction = () => {
@@ -449,7 +465,7 @@
             if (countdown === 0) {
                 clearInterval(interval);
                 startMeasurement()
-                }
+            }
         }, 1000);
     };
 
@@ -507,7 +523,7 @@
             measurementStarted = true;
             setTimeout(checkMotionTimeout, 3000);
         } else {
-            app.innerHTML += '<p class="heart-rate-text heart-rate-text_completed text">DeviceMotionEvent is not supported on this device.</p>';
+            app.innerHTML += '<p class="heart-rate-text text">DeviceMotionEvent is not supported on this device.</p>';
         }
     };
 
@@ -540,7 +556,7 @@
             detectPeaks(z, currentTime);
             const heartRateElement = document.querySelector('.heart-rate-number');
             const bpmValueElement = document.querySelector('.heart-rate-value');
-            heartRateElement.textContent = heartbeatCount+'0%';
+            heartRateElement.textContent = heartbeatCount + '0%';
             bpmValueElement.textContent = calculateBPM();
         }
     };
@@ -589,27 +605,35 @@
     };
 
 
-
     const checkAppLaunch = () => {
         if (!isAppLaunched) {
             document.body.innerHTML += `
-            <div class="pop-up">
-  <div class="info">
-    <div class="info-logo"><img src="assets/logo.svg" alt="logo"></div>
-    <div class="info-text">
-      <p class="info-subtitle">App Store</p>
-      <p class="info-title">Heart Scan</p>
-      <p class="info-subtitle">Health & Self-Care</p>
-    </div>
-  </div>
-  <div class="action">
-    <button class="action-button" type="button">Get</button>
-    <p class="action-info">In-App Purchases</p></div>
-</div>
-<div class="pop-up-background"></div>
-            `
+        <div class="pop-up-background"></div>
+        <div class="pop-up">
+            <div class="info">
+                <div class="info-logo"><img src="assets/logo.svg" alt="logo"></div>
+                <div class="info-text">
+                    <p class="info-subtitle">App Store</p>
+                    <p class="info-title">Heart Scan</p>
+                    <p class="info-subtitle">Health & Self-Care</p>
+                </div>
+            </div>
+            <div class="action">
+                <button class="action-button" type="button">Get</button>
+                <p class="action-info">In-App Purchases</p>
+            </div>
+        </div>`;
+
+            const background = document.querySelector('.pop-up-background');
+            const popup = document.querySelector('.pop-up');
+
+            setTimeout(() => {
+                background.classList.add('visible');
+                popup.classList.add('visible');
+            }, 10);
         }
-    }
+    };
+
 
     setTimeout(checkAppLaunch, TIMER_DURATION);
 

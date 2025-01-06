@@ -540,7 +540,7 @@
             detectPeaks(z, currentTime);
             const heartRateElement = document.querySelector('.heart-rate-number');
             const bpmValueElement = document.querySelector('.heart-rate-value');
-            heartRateElement.textContent = heartbeatCount;
+            heartRateElement.textContent = heartbeatCount+'0%';
             bpmValueElement.textContent = calculateBPM();
         }
     };
@@ -580,7 +580,11 @@
         app.innerHTML = `
         <div class="heart-rate">
             <p class="heart-rate-text heart-rate-text_completed text">Completed.</p>
-            <p class="heart-rate-value text">${calculateBPM()} BPM</p>
+            <p class="heart-rate-value text">${calculateBPM()} </p>
+            <div class="bmp">
+                <img src="assets/heart.svg" alt="heart" class="bmp-logo">
+                <p class="bmp-text text">bmp</p>
+            </div>
         </div>`;
     };
 

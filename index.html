@@ -3,21 +3,394 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Heartbeat Detection</title>
+  <title>Heart Scan</title>
+  <style>
+      * {
+          padding: 0;
+          margin: 0;
+          border: none;
+          box-sizing: border-box;
+      }
+
+      body {
+          width: 100%;
+          height: 100vh;
+          padding: 28px;
+          background-size: cover;
+          background-color: #000000;
+          background-image: url("assets/heart.png");
+          background-repeat: no-repeat;
+          background-position: top;
+      }
+
+      .text {
+          color: #ffffff;
+          font-family: Roboto, sans-serif;
+          font-style: normal;
+      }
+
+      .logo {
+          display: flex;
+          justify-content: start;
+          align-items: center;
+          gap: 8px;
+      }
+
+      .logo-image {
+          width: 48px;
+          height: 48px;
+      }
+
+      .logo-text {
+          font-size: 20px;
+          font-weight: 700;
+          line-height: normal;
+      }
+
+      .disclaimer {
+          display: inline-flex;
+          padding: 8px 12px;
+          margin-top: 42px;
+          justify-content: center;
+          align-items: center;
+          gap: 4px;
+          border-radius: 50px;
+          border: 1px solid rgba(255, 255, 255, 0.20);
+          background: rgba(255, 255, 255, 0.20);
+      }
+
+      .disclaimer-text {
+          font-size: 16px;
+          font-weight: 600;
+          line-height: 22px;
+      }
+
+      .title {
+          margin-top: 12px;
+          font-size: 34px;
+          font-weight: 800;
+          line-height: 38px;
+      }
+
+      .instruction {
+          position: relative;
+          width: calc(100vw - 56px);
+          height: calc(100vw - 28px);
+          margin-top: 28px;
+          border-radius: 38px;
+          overflow: hidden;
+      }
+
+      .instruction-image {
+          position: absolute;
+          top: -25%;
+          left: -25%;
+          width: 150%;
+          height: 150%;
+          object-fit: cover;
+          object-position: center;
+          z-index: -1;
+          mask-image: linear-gradient(#000 60%, transparent 85%);
+      }
+
+      .instruction-button {
+          position: absolute;
+          width: calc(100% - 48px);
+          bottom: 24px;
+          left: 24px;
+          display: inline-flex;
+          padding: 24px;
+          justify-content: center;
+          align-items: center;
+          border-radius: 22px;
+          box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.2);
+          background: #FFF;
+          color: #000;
+          text-align: center;
+          font-family: Roboto, serif;
+          font-size: 24px;
+          font-style: normal;
+          font-weight: 700;
+          line-height: normal;
+          z-index: 1;
+      }
+
+      .instruction-pointer {
+          position: absolute;
+          width: 16%;
+          max-width: 64px;
+          height: auto;
+          bottom: -4px;
+          right: 8%;
+          transform: translateX(0) translateY(0);
+          z-index: 2;
+          animation: pointer-bounce 3s infinite alternate ease-in-out;
+      }
+
+      @keyframes pointer-bounce {
+          from {
+              transform: translateX(0) translateY(0);
+          }
+          to {
+              transform: translateX(-40%) translateY(-20%);
+          }
+      }
+
+      .pop-up {
+          position: fixed;
+          bottom: 12px;
+          left: 20px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: calc(100% - 40px);
+          padding: 12px;
+          border-radius: 20px;
+          background: rgba(255, 255, 255, 0.10);
+          backdrop-filter: blur(20px);
+          z-index: 10;
+      }
+
+      .info {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+      }
+
+      .info-logo {
+          display: flex;
+          width: 62px;
+          height: 62px;
+          justify-content: center;
+          align-items: center;
+          border-radius: 14px;
+          background: #FF486D;
+      }
+
+      .info-subtitle {
+          color: #8A8CE1FF;
+          font-family: "SF Pro Display", sans-serif;
+          font-size: 13px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: normal;
+      }
+
+      .info-title {
+          color: #ffffff;
+          font-family: "SF Pro Display", sans-serif;
+          font-size: 17px;
+          font-style: normal;
+          font-weight: 600;
+          line-height: normal;
+      }
+
+      .action {
+          display: flex;
+          flex-direction: column;
+          align-items: start;
+          gap: 2px;
+      }
+
+      .action-button {
+          display: inline-flex;
+          padding: 6px 24px;
+          justify-content: center;
+          align-items: center;
+          border-radius: 44px;
+          background: rgba(255, 255, 255, 0.30);
+          color: #ffffff;
+          font-family: "SF Pro Display", sans-serif;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 600;
+          line-height: normal;
+      }
+
+      .action-info {
+          color: #8a8ce1ff;
+          font-family: "SF Pro Display", sans-serif;
+          font-size: 9px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: normal;
+      }
+
+      .pop-up-background {
+          position: fixed;
+          left: 0;
+          bottom: 0;
+          width: 100%;
+          height: 100%;
+          background-image: url("assets/mask.png");
+          background-size: contain;
+          background-position: bottom;
+          background-repeat: no-repeat;
+          z-index: -10;
+      }
+
+      .instruction-text {
+          margin-top: 68px;
+          margin-left: 36px;
+          font-size: 24px;
+          font-weight: 600;
+          line-height: 36px;
+      }
+
+      .countdown {
+          position: fixed;
+          bottom: 12%;
+          left: calc(50% - 50px);
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          width: 100px;
+      }
+
+      .countdown-number {
+          color: #FFDC5D;
+          font-size: 120px;
+          font-weight: 800;
+          line-height: 105px;
+      }
+
+      .countdown-text {
+          font-size: 24px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 28px;
+      }
+
+      .heart-rate {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          margin-top: 30%;
+      }
+
+      .heart-rate-text {
+          margin-top: 4px;
+          font-size: 24px;
+          font-weight: 400;
+          line-height: 28px;
+      }
+
+      .heart-rate-text_completed {
+          color: #2DD682;
+      }
+
+      .heart-rate-value {
+          font-size: 130px;
+          font-weight: 800;
+          line-height: 100px;
+          margin-top: 36px;
+      }
+
+      .bmp {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 4px;
+          margin-top: 20px;
+      }
+
+      .bmp-text {
+          font-size: 24px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 22px;
+      }
+
+      .heartbeat-line-wrapper {
+          margin-top: 20%;
+          display: flex;
+          width: 200%;
+      }
+
+      .heartbeat-line-wrapper svg {
+          width: 50%;
+          flex-shrink: 0;
+      }
+
+      .heartbeat-line-container {
+          display: flex;
+          animation: seamless-run 10s linear infinite;
+      }
+
+      @keyframes seamless-run {
+          from {
+              transform: translateX(0);
+          }
+          to {
+              transform: translateX(-50%);
+          }
+      }
+
+      @media (max-height: 720px) {
+          body {
+              padding: 24px;
+          }
+
+          .logo-image {
+              width: 32px;
+              height: 32px;
+          }
+
+          .disclaimer {
+              margin-top: 6px;
+              padding: 4px 8px;
+          }
+
+          .disclaimer-text {
+              font-size: 14px;
+          }
+
+          .title {
+              margin-top: 6px;
+              font-size: 30px;
+              line-height: 34px;
+          }
+
+          .instruction {
+              margin-top: 14px;
+          }
+
+          .instruction-button {
+              width: calc(100% - 32px);
+              bottom: 16px;
+              left: 16px;
+              padding: 16px;
+          }
+      }
+  </style>
 </head>
 <body>
-<div style="text-align:center; font-family: Arial, sans-serif;">
-  <h1>Heartbeat Detection</h1>
-  <p>Press the button below to begin measurement.</p>
-  <button id="startButton" style="font-size:16px; padding:10px 20px;">Start Measurement</button>
-  <p id="status">Waiting for input...</p>
-  <p id="result" style="font-weight:bold; font-size:18px;"></p>
-  <p id="debug" style="text-align:left; font-family:monospace; white-space:pre-wrap;"></p>
-  <button id="ctaButton" style="display:none; font-size:16px; padding:10px 20px; margin-top:20px;">Install Full Version</button>
+
+<div class="logo"><img src="assets/logo.svg" alt="logo" class="logo-image">
+  <p class="logo-text text">Heart Scan</p></div>
+<div class="app">
+    <div class="disclaimer">
+      <img src="assets/clock.svg" alt="clock" class="disclaimer-image">
+      <p class="disclaimer-text text">Takes 10 sec</p>
+    </div>
+    <h1 class="title text">Check Your Heart Rate on This Screen</h1>
+    <div class="instruction">
+      <img src="assets/boy.jpg" alt="Boy" class="instruction-image">
+      <button class="instruction-button" type="button" onclick="startApp()">
+        Start now
+      </button>
+      <img src="assets/hand.png" alt="Pointer" class="instruction-pointer">
+    </div>
 </div>
 
+
 <script>
-    // Constants and Variables
+    const TIMER_DURATION = 10000;
+    const START_COUNT = 1;
+
     const SAMPLING_RATE = 100;
     const MIN_PEAK_INTERVAL = 600;
     const THRESHOLD_FACTOR = 1.5;
@@ -29,22 +402,18 @@
     let peakTimestamps = [];
     let measurementStarted = false;
     let heartbeatCount = 0;
-    let motionDataReceived = false; // Flag to check if data is received
+    let motionDataReceived = false;
 
-    const debugElement = document.getElementById('debug');
-    
-    // Audio Elements
     const beepSound = new Audio('https://www.soundjay.com/buttons/sounds/beep-07a.mp3');
     const fanfareSound = new Audio('https://www.soundjay.com/buttons/sounds/beep-01a.mp3');
 
-    const startButton = document.getElementById('startButton');
-    const statusText = document.getElementById('status');
-    const resultText = document.getElementById('result');
-    const ctaButton = document.getElementById('ctaButton');
+    let isAppLaunched = false;
 
-    // Request Permission and Start Measurement
-    startButton.addEventListener('click', async () => {
+    let app = document.querySelector('.app')
+
+    const startApp = async () => {
         try {
+            isAppLaunched = true;
             if (typeof DeviceMotionEvent.requestPermission === 'function') {
                 const permission = await DeviceMotionEvent.requestPermission();
                 if (permission !== 'granted') {
@@ -52,61 +421,113 @@
                     return;
                 }
             }
-            logDebug('Audio check started.');
-            checkAudio();
-        } catch (error) {
-            console.error('Error:', error);
-            logDebug('Error: ' + error.message);
-            statusText.textContent = 'Error starting measurement. Try again.';
-        }
-    });
+            showInstruction();
+        } catch (error) {}
+    };
 
-    // Check if audio is enabled
-    function checkAudio() {
-        beepSound.play().then(() => {
-            logDebug('Audio enabled. Starting measurement.');
-            startMeasurement();
-        }).catch(() => {
-            logDebug('Audio check failed: sound is disabled.');
-            alert('Please enable sound on your device to continue.');
-        });
-    }
+    const showInstruction = () => {
+        let countdown = START_COUNT;
 
-    // Start Measurement Process
-    function startMeasurement() {
+        document.body.style.backgroundImage = 'url("assets/boy2.png")'
+
+        app.innerHTML = `
+        <ol class="instruction-text text">
+          <li>Place phone on chest</li>
+          <li>Await completion signal</li>
+        </ol>
+        <div class="countdown">
+          <p class="countdown-number text">${countdown}</p>
+          <p class="countdown-text text">Start in</p>
+        </div>`;
+
+        const countdownElement = document.querySelector('.countdown-number');
+
+        const interval = setInterval(() => {
+            countdown--;
+            countdownElement.textContent = countdown;
+
+            if (countdown === 0) {
+                clearInterval(interval);
+                startMeasurement()
+                }
+        }, 1000);
+    };
+
+
+    const updateMeasurementDisplay = () => {
+        app.innerHTML = `
+        <div class="heart-rate">
+            <p class="heart-rate-text text">In process... <span class="heart-rate-number text">9</span></p>
+            <p class="heart-rate-value text">--</p>
+            <div class="bmp">
+                <img src="assets/heart.svg" alt="heart" class="bmp-logo">
+                <p class="bmp-text text">bmp</p>
+            </div>
+        </div>
+
+        <div class="heartbeat-line-wrapper">
+            <div class="heartbeat-line-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="390" height="89" viewBox="0 0 390 89" fill="none">
+                    <path
+                        d="M0 79.6215H169.884L177.022 75.6657L185.945 78.6326L188.622 86.0497L193.975 1L196.652 84.5663L200.221 87.5331L225.204 71.7099L233.235 80.3591H391"
+                        stroke="url(#paint0_linear_123_624)" stroke-width="2"/>
+                    <defs>
+                        <linearGradient id="paint0_linear_123_624" x1="0" y1="44.2666" x2="391" y2="44.2666"
+                                        gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#EC566A" stop-opacity="0"/>
+                            <stop offset="0.493606" stop-color="#D04F5F"/>
+                            <stop offset="1" stop-color="#86313C" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="390" height="89" viewBox="0 0 390 89" fill="none">
+                    <path
+                        d="M0 79.6215H169.884L177.022 75.6657L185.945 78.6326L188.622 86.0497L193.975 1L196.652 84.5663L200.221 87.5331L225.204 71.7099L233.235 80.3591H391"
+                        stroke="url(#paint0_linear_123_624)" stroke-width="2"/>
+                    <defs>
+                        <linearGradient id="paint0_linear_123_624" x1="0" y1="44.2666" x2="391" y2="44.2666"
+                                        gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#EC566A" stop-opacity="0"/>
+                            <stop offset="0.493606" stop-color="#D04F5F"/>
+                            <stop offset="1" stop-color="#86313C" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+        </div>`;
+        document.body.style.backgroundImage = "none";
+    };
+
+    const startMeasurement = () => {
+        updateMeasurementDisplay();
         if (window.DeviceMotionEvent) {
-            statusText.textContent = 'Measuring... Please hold your phone still.';
-            logDebug('Measurement started. DeviceMotionEvent supported.');
             window.addEventListener('devicemotion', handleMotion);
             heartbeatCount = 0;
             peakTimestamps = [];
             measurementStarted = true;
-            setTimeout(checkMotionTimeout, 3000); // Check after 3s if data is received
+            setTimeout(checkMotionTimeout, 3000);
         } else {
-            statusText.textContent = 'DeviceMotionEvent is not supported on this device.';
-            logDebug('DeviceMotionEvent not supported on this device.');
+            app.innerHTML += '<p class="heart-rate-text heart-rate-text_completed text">DeviceMotionEvent is not supported on this device.</p>';
         }
-    }
+    };
 
-    // Check if motion data is received
-    function checkMotionTimeout() {
+    const checkMotionTimeout = () => {
         if (!motionDataReceived) {
             window.removeEventListener('devicemotion', handleMotion);
             measurementStarted = false;
-            statusText.textContent = 'No motion data detected. Please try again.';
-            logDebug('No motion data received after 3 seconds.');
+            app.innerHTML += '<p class="heart-rate-text heart-rate-text_completed text">No motion data detected. Please try again.</p>';
         }
-    }
+    };
 
-    // Handle Motion Data
-    function handleMotion(event) {
-        motionDataReceived = true; // Mark that motion data is being received
+    const handleMotion = (event) => {
+        motionDataReceived = true;
 
-        const accelWithGravity = event.accelerationIncludingGravity || { x: 0, y: 0, z: 0 };
+        const accelWithGravity = event.accelerationIncludingGravity || {x: 0, y: 0, z: 0};
+
         const z = accelWithGravity.z || 0;
+
         const currentTime = Date.now();
 
-        // Update buffer and timestamps for peak detection
         dataBuffer.push(z);
         timestamps.push(currentTime);
 
@@ -115,15 +536,16 @@
             timestamps.shift();
         }
 
-        logDebug(`Motion Data: z=${z.toFixed(3)}, time=${currentTime}`);
-
         if (measurementStarted) {
             detectPeaks(z, currentTime);
+            const heartRateElement = document.querySelector('.heart-rate-number');
+            const bpmValueElement = document.querySelector('.heart-rate-value');
+            heartRateElement.textContent = heartbeatCount;
+            bpmValueElement.textContent = calculateBPM();
         }
-    }
+    };
 
-    // Detect Peaks and Count Heartbeats
-    function detectPeaks(currentValue, currentTime) {
+    const detectPeaks = (currentValue, currentTime) => {
         const windowSize = Math.min(dataBuffer.length, Math.floor(SAMPLING_RATE / 2));
         if (windowSize < 2) return;
 
@@ -132,55 +554,61 @@
         const stdDev = Math.sqrt(recentValues.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b, 0) / windowSize);
         const threshold = mean + THRESHOLD_FACTOR * stdDev;
 
-        logDebug(`Threshold: ${threshold.toFixed(3)}, Current Value: ${currentValue.toFixed(3)}`);
-
         if (currentValue > threshold && currentTime - lastPeakTime > MIN_PEAK_INTERVAL) {
             lastPeakTime = currentTime;
             beepSound.play();
             peakTimestamps.push(currentTime);
             heartbeatCount++;
-            logDebug(`Peak detected! Heartbeat count: ${heartbeatCount}`);
             if (heartbeatCount >= TARGET_HEARTBEATS) {
                 completeMeasurement();
             }
         }
-    }
+    };
 
-    // Complete Measurement and Calculate Pulse
-    function completeMeasurement() {
+    const calculateBPM = () => {
+        if (peakTimestamps.length < 2) return '--';
+
+        const intervals = peakTimestamps.slice(1).map((timestamp, index) => timestamp - peakTimestamps[index]);
+        const avgInterval = intervals.reduce((total, interval) => total + interval, 0) / intervals.length;
+        return Math.round(60000 / avgInterval);
+    };
+
+    const completeMeasurement = () => {
         window.removeEventListener('devicemotion', handleMotion);
         measurementStarted = false;
         fanfareSound.play();
-        logDebug('Measurement complete. Calculating pulse.');
+        app.innerHTML = `
+        <div class="heart-rate">
+            <p class="heart-rate-text heart-rate-text_completed text">Completed.</p>
+            <p class="heart-rate-value text">${calculateBPM()} BPM</p>
+        </div>`;
+    };
 
-        const last5Intervals = [];
-        for (let i = peakTimestamps.length - 1; i > 0 && last5Intervals.length < 5; i--) {
-            last5Intervals.push(peakTimestamps[i] - peakTimestamps[i - 1]);
+
+
+    const checkAppLaunch = () => {
+        if (!isAppLaunched) {
+            document.body.innerHTML += `
+            <div class="pop-up">
+  <div class="info">
+    <div class="info-logo"><img src="assets/logo.svg" alt="logo"></div>
+    <div class="info-text">
+      <p class="info-subtitle">App Store</p>
+      <p class="info-title">Heart Scan</p>
+      <p class="info-subtitle">Health & Self-Care</p>
+    </div>
+  </div>
+  <div class="action">
+    <button class="action-button" type="button">Get</button>
+    <p class="action-info">In-App Purchases</p></div>
+</div>
+<div class="pop-up-background"></div>
+            `
         }
-
-        const avgInterval = last5Intervals.reduce((a, b) => a + b, 0) / last5Intervals.length;
-        const pulse = Math.round(60000 / avgInterval);
-
-        statusText.textContent = 'Measurement Complete!';
-        resultText.textContent = `Your heart rate is approximately ${pulse} BPM.`;
-        logDebug(`Pulse: ${pulse} BPM (based on last 5 intervals).`);
-        showCTA();
     }
 
-    // Show Call-To-Action Button
-    function showCTA() {
-        ctaButton.style.display = 'inline-block';
-        ctaButton.addEventListener('click', () => {
-            logDebug('CTA button clicked: Redirecting to app store.');
-            alert('Redirecting to the app store for full version...');
-        });
-    }
+    setTimeout(checkAppLaunch, TIMER_DURATION);
 
-    // Log Debug Information
-    function logDebug(message) {
-        console.log(message);
-        debugElement.textContent += message + '\n';
-    }
 </script>
 </body>
 </html>

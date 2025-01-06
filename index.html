@@ -6,7 +6,9 @@
   <title>Heart Scan</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+  <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet">
   <style>
       * {
           padding: 0;
@@ -34,7 +36,7 @@
           z-index: -1;
       }
 
-      .background-image.animated {
+      .background-image_animated {
           top: 4%;
           animation: fadeInOut 4s ease-in-out infinite;
       }
@@ -42,7 +44,7 @@
       @keyframes fadeInOut {
           0% {
               opacity: 0.8;
-          } 
+          }
           50% {
               opacity: 0.5;
           }
@@ -50,7 +52,6 @@
               opacity: 0.8;
           }
       }
-
 
 
       .text {
@@ -182,7 +183,14 @@
           transition: all 2s ease-in-out;
       }
 
-      .pop-up.visible {
+      .pop-up-benefit {
+          position: initial;
+          width: 100%;
+          padding: 12px;
+          margin-top: 44px;
+      }
+
+      .pop-up_visible {
           bottom: 16px;
       }
 
@@ -266,7 +274,7 @@
           transition: opacity 2s ease-in-out;
       }
 
-      .pop-up-background.visible {
+      .pop-up-background_visible {
           opacity: 1;
       }
 
@@ -371,6 +379,48 @@
           }
       }
 
+      .benefits {
+          position: fixed;
+          left: 0;
+          bottom: -100%;
+          width: 100%;
+          padding: 20px;
+          border-radius: 20px;
+          background: linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.00) 100%);
+          transition: all 2s ease-in-out;
+      }
+
+      .benefits_visible {
+          bottom: 0;
+      }
+
+      .benefits-text {
+          padding: 12px 20px;
+          font-size: 32px;
+          font-weight: 700;
+          line-height: 36px;
+      }
+
+      .benefits-list {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          padding: 4px 20px;
+      }
+
+      .benefits-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+      }
+
+      .benefits-item-text {
+          font-size: 16px;
+          font-weight: 400;
+          line-height: 20px;
+      }
+
+
       @media (max-height: 720px) {
           body {
               padding: 24px;
@@ -414,24 +464,24 @@
 <div class="logo"><img src="assets/logo.svg" alt="logo" class="logo-image">
   <p class="logo-text text">Heart Scan</p></div>
 <div class="app">
-  <img src="assets/heart.png" alt="Background" class="background-image">
-  <div class="disclaimer">
-    <img src="assets/clock.svg" alt="clock" class="disclaimer-image">
-    <p class="disclaimer-text text">Takes 10 sec</p>
-  </div>
-  <h1 class="title text">Check Your Heart Rate on This Screen</h1>
-  <div class="instruction">
-    <img src="assets/boy.jpg" alt="Boy" class="instruction-image">
-    <button class="instruction-button" type="button" onclick="startApp()">
-      Start now
-    </button>
-    <img src="assets/hand.png" alt="Pointer" class="instruction-pointer">
-  </div>
+    <img src="assets/heart.png" alt="Background" class="background-image">
+    <div class="disclaimer">
+      <img src="assets/clock.svg" alt="clock" class="disclaimer-image">
+      <p class="disclaimer-text text">Takes 10 sec</p>
+    </div>
+    <h1 class="title text">Check Your Heart Rate on This Screen</h1>
+    <div class="instruction">
+      <img src="assets/boy.jpg" alt="Boy" class="instruction-image">
+      <button class="instruction-button" type="button" onclick="startApp()">
+        Start now
+      </button>
+      <img src="assets/hand.png" alt="Pointer" class="instruction-pointer">
+    </div>
 </div>
 
 
 <script>
-    const TIMER_DURATION = 8000;
+    const TIMER_DURATION = 800000;
     const START_COUNT = 1;
 
     const SAMPLING_RATE = 100;
@@ -543,7 +593,7 @@
         document.body.style.backgroundImage = "none";
         const backgroundImage = document.querySelector('.background-image');
         if (backgroundImage) {
-            backgroundImage.classList.add('animated');
+            backgroundImage.classList.add('background-image_animated');
         }
 
     };
@@ -573,9 +623,7 @@
         motionDataReceived = true;
 
         const accelWithGravity = event.accelerationIncludingGravity || {x: 0, y: 0, z: 0};
-
         const z = accelWithGravity.z || 0;
-
         const currentTime = Date.now();
 
         dataBuffer.push(z);
@@ -635,7 +683,64 @@
                 <img src="assets/heart.svg" alt="heart" class="bmp-logo">
                 <p class="bmp-text text">bmp</p>
             </div>
-        </div>`;
+        </div>
+  <div class="benefits">
+    <p class="benefits-text text">Get access <br>
+      to all benefits</p>
+    <div class="benefits-list">
+      <div class="benefits-item">
+        <svg class="benefits-icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
+             xmlns="http://www.w3.org/2000/svg">
+          <path id="Vector"
+                d="M10.6 13.8L8.45 11.65C8.26667 11.4667 8.03333 11.375 7.75 11.375C7.46667 11.375 7.23333 11.4667 7.05 11.65C6.86667 11.8333 6.775 12.0667 6.775 12.35C6.775 12.6333 6.86667 12.8667 7.05 13.05L9.9 15.9C10.1 16.1 10.3333 16.2 10.6 16.2C10.8667 16.2 11.1 16.1 11.3 15.9L16.95 10.25C17.1333 10.0667 17.225 9.83333 17.225 9.55C17.225 9.26667 17.1333 9.03333 16.95 8.85C16.7667 8.66667 16.5333 8.575 16.25 8.575C15.9667 8.575 15.7333 8.66667 15.55 8.85L10.6 13.8ZM12 22C10.6167 22 9.31667 21.7375 8.1 21.2125C6.88333 20.6875 5.825 19.975 4.925 19.075C4.025 18.175 3.3125 17.1167 2.7875 15.9C2.2625 14.6833 2 13.3833 2 12C2 10.6167 2.2625 9.31667 2.7875 8.1C3.3125 6.88333 4.025 5.825 4.925 4.925C5.825 4.025 6.88333 3.3125 8.1 2.7875C9.31667 2.2625 10.6167 2 12 2C13.3833 2 14.6833 2.2625 15.9 2.7875C17.1167 3.3125 18.175 4.025 19.075 4.925C19.975 5.825 20.6875 6.88333 21.2125 8.1C21.7375 9.31667 22 10.6167 22 12C22 13.3833 21.7375 14.6833 21.2125 15.9C20.6875 17.1167 19.975 18.175 19.075 19.075C18.175 19.975 17.1167 20.6875 15.9 21.2125C14.6833 21.7375 13.3833 22 12 22ZM12 20C14.2333 20 16.125 19.225 17.675 17.675C19.225 16.125 20 14.2333 20 12C20 9.76667 19.225 7.875 17.675 6.325C16.125 4.775 14.2333 4 12 4C9.76667 4 7.875 4.775 6.325 6.325C4.775 7.875 4 9.76667 4 12C4 14.2333 4.775 16.125 6.325 17.675C7.875 19.225 9.76667 20 12 20Z"
+                fill="#29C175"/>
+        </svg>
+        <span class="benefits-item-text text">Unlimited heart rate measurements</span>
+      </div>
+      <div class="benefits-item">
+        <svg class="benefits-icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
+             xmlns="http://www.w3.org/2000/svg">
+          <path id="Vector"
+                d="M10.6 13.8L8.45 11.65C8.26667 11.4667 8.03333 11.375 7.75 11.375C7.46667 11.375 7.23333 11.4667 7.05 11.65C6.86667 11.8333 6.775 12.0667 6.775 12.35C6.775 12.6333 6.86667 12.8667 7.05 13.05L9.9 15.9C10.1 16.1 10.3333 16.2 10.6 16.2C10.8667 16.2 11.1 16.1 11.3 15.9L16.95 10.25C17.1333 10.0667 17.225 9.83333 17.225 9.55C17.225 9.26667 17.1333 9.03333 16.95 8.85C16.7667 8.66667 16.5333 8.575 16.25 8.575C15.9667 8.575 15.7333 8.66667 15.55 8.85L10.6 13.8ZM12 22C10.6167 22 9.31667 21.7375 8.1 21.2125C6.88333 20.6875 5.825 19.975 4.925 19.075C4.025 18.175 3.3125 17.1167 2.7875 15.9C2.2625 14.6833 2 13.3833 2 12C2 10.6167 2.2625 9.31667 2.7875 8.1C3.3125 6.88333 4.025 5.825 4.925 4.925C5.825 4.025 6.88333 3.3125 8.1 2.7875C9.31667 2.2625 10.6167 2 12 2C13.3833 2 14.6833 2.2625 15.9 2.7875C17.1167 3.3125 18.175 4.025 19.075 4.925C19.975 5.825 20.6875 6.88333 21.2125 8.1C21.7375 9.31667 22 10.6167 22 12C22 13.3833 21.7375 14.6833 21.2125 15.9C20.6875 17.1167 19.975 18.175 19.075 19.075C18.175 19.975 17.1167 20.6875 15.9 21.2125C14.6833 21.7375 13.3833 22 12 22ZM12 20C14.2333 20 16.125 19.225 17.675 17.675C19.225 16.125 20 14.2333 20 12C20 9.76667 19.225 7.875 17.675 6.325C16.125 4.775 14.2333 4 12 4C9.76667 4 7.875 4.775 6.325 6.325C4.775 7.875 4 9.76667 4 12C4 14.2333 4.775 16.125 6.325 17.675C7.875 19.225 9.76667 20 12 20Z"
+                fill="#29C175"/>
+        </svg>
+        <span class="benefits-item-text text">Detects critical heart abnormalities</span>
+      </div>
+      <div class="benefits-item">
+        <svg class="benefits-icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
+             xmlns="http://www.w3.org/2000/svg">
+          <path id="Vector"
+                d="M10.6 13.8L8.45 11.65C8.26667 11.4667 8.03333 11.375 7.75 11.375C7.46667 11.375 7.23333 11.4667 7.05 11.65C6.86667 11.8333 6.775 12.0667 6.775 12.35C6.775 12.6333 6.86667 12.8667 7.05 13.05L9.9 15.9C10.1 16.1 10.3333 16.2 10.6 16.2C10.8667 16.2 11.1 16.1 11.3 15.9L16.95 10.25C17.1333 10.0667 17.225 9.83333 17.225 9.55C17.225 9.26667 17.1333 9.03333 16.95 8.85C16.7667 8.66667 16.5333 8.575 16.25 8.575C15.9667 8.575 15.7333 8.66667 15.55 8.85L10.6 13.8ZM12 22C10.6167 22 9.31667 21.7375 8.1 21.2125C6.88333 20.6875 5.825 19.975 4.925 19.075C4.025 18.175 3.3125 17.1167 2.7875 15.9C2.2625 14.6833 2 13.3833 2 12C2 10.6167 2.2625 9.31667 2.7875 8.1C3.3125 6.88333 4.025 5.825 4.925 4.925C5.825 4.025 6.88333 3.3125 8.1 2.7875C9.31667 2.2625 10.6167 2 12 2C13.3833 2 14.6833 2.2625 15.9 2.7875C17.1167 3.3125 18.175 4.025 19.075 4.925C19.975 5.825 20.6875 6.88333 21.2125 8.1C21.7375 9.31667 22 10.6167 22 12C22 13.3833 21.7375 14.6833 21.2125 15.9C20.6875 17.1167 19.975 18.175 19.075 19.075C18.175 19.975 17.1167 20.6875 15.9 21.2125C14.6833 21.7375 13.3833 22 12 22ZM12 20C14.2333 20 16.125 19.225 17.675 17.675C19.225 16.125 20 14.2333 20 12C20 9.76667 19.225 7.875 17.675 6.325C16.125 4.775 14.2333 4 12 4C9.76667 4 7.875 4.775 6.325 6.325C4.775 7.875 4 9.76667 4 12C4 14.2333 4.775 16.125 6.325 17.675C7.875 19.225 9.76667 20 12 20Z"
+                fill="#29C175"/>
+        </svg>
+        <span class="benefits-item-text text">Cardiac cycle duration recorded</span>
+      </div>
+    </div>
+    <div class="pop-up-background"></div>
+    <div class="pop-up pop-up-benefit">
+      <div class="info">
+        <div class="info-logo"><img src="assets/logo.svg" alt="logo"></div>
+        <div class="info-text">
+          <p class="info-subtitle">App Store</p>
+          <p class="info-title">Heart Scan</p>
+          <p class="info-subtitle">Health & Self-Care</p>
+        </div>
+      </div>
+      <div class="action">
+        <button class="action-button" type="button">Get</button>
+        <p class="action-info">In-App Purchases</p>
+      </div>
+    </div>
+  </div>
+`;
+
+        const background = document.querySelector('.pop-up-background');
+        const benefits = document.querySelector('.benefits');
+
+        setTimeout(() => {
+            background.classList.add('pop-up-background_visible');
+            benefits.classList.add('benefits_visible');
+        }, 10);
     };
 
 
@@ -662,8 +767,8 @@
             const popup = document.querySelector('.pop-up');
 
             setTimeout(() => {
-                background.classList.add('visible');
-                popup.classList.add('visible');
+                background.classList.add('pop-up-background_visible');
+                popup.classList.add('pop-up_visible');
             }, 10);
         }
     };

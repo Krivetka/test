@@ -456,6 +456,22 @@
               left: 16px;
               padding: 16px;
           }
+
+          .heart-rate {
+              margin-top: 12%;
+          }
+
+          .benefits {
+              padding: 12px 20px;
+          }
+
+          .benefits-text {
+              padding: 4px 20px;
+          }
+
+          .pop-up-benefit{
+              margin-top: 12px;
+          }
       }
   </style>
 </head>
@@ -481,8 +497,8 @@
 
 
 <script>
-    const TIMER_DURATION = 800000;
-    const START_COUNT = 1;
+    const TIMER_DURATION = 15000;
+    const START_COUNT = 3;
 
     const SAMPLING_RATE = 100;
     const MIN_PEAK_INTERVAL = 600;
@@ -515,8 +531,7 @@
                 }
             }
             showInstruction();
-        } catch (error) {
-        }
+        } catch (error) {        }
     };
 
     const showInstruction = () => {

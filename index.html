@@ -3,12 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="ad.orientation" content="portrait">
   <title>Heart Scan</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
-      rel="stylesheet">
+  <script type="text/javascript" src="https://tpc.googlesyndication.com/pagead/gadgets/html5/api/exitapi.js"> </script>
+  <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-analytics.js";
+
+      const firebaseConfig = {
+          apiKey: "AIzaSyDT2jrxy6Z0dHexZdOKyn03qK8ShT4ybDI",
+          authDomain: "heart-scan.firebaseapp.com",
+          projectId: "heart-scan",
+          storageBucket: "heart-scan.firebasestorage.app",
+          messagingSenderId: "560986842381",
+          appId: "1:560986842381:web:52df2372441ae7fa1bfc44",
+          measurementId: "G-FYJ4EVTQBJ"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+  </script>
+
   <style>
       * {
           padding: 0;
@@ -265,7 +280,7 @@
           bottom: 0;
           width: 100%;
           height: 100%;
-          background-image: url("assets/mask.png");
+          background-image: url("images/mask.png");
           background-size: contain;
           background-position: bottom;
           background-repeat: no-repeat;
@@ -477,21 +492,21 @@
 </head>
 <body>
 
-<div class="logo"><img src="assets/logo.svg" alt="logo" class="logo-image">
+<div class="logo"><img src="images/logo.svg" alt="logo" class="logo-image">
   <p class="logo-text text">Heart Scan</p></div>
 <div class="app">
-    <img src="assets/heart.png" alt="Background" class="background-image">
+    <img src="images/heart.png" alt="Background" class="background-image">
     <div class="disclaimer">
-      <img src="assets/clock.svg" alt="clock" class="disclaimer-image">
+      <img src="images/clock.svg" alt="clock" class="disclaimer-image">
       <p class="disclaimer-text text">Takes 10 sec</p>
     </div>
     <h1 class="title text">Check Your Heart Rate on This Screen</h1>
     <div class="instruction">
-      <img src="assets/boy.jpg" alt="Boy" class="instruction-image">
+      <img src="images/boy.jpg" alt="Boy" class="instruction-image">
       <button class="instruction-button" type="button" onclick="startApp()">
         Start now
       </button>
-      <img src="assets/hand.png" alt="Pointer" class="instruction-pointer">
+      <img src="images/hand.png" alt="Pointer" class="instruction-pointer">
     </div>
 </div>
 
@@ -513,8 +528,8 @@
     let heartbeatCount = 0;
     let motionDataReceived = false;
 
-    const beepSound = new Audio('https://www.soundjay.com/buttons/sounds/beep-07a.mp3');
-    const fanfareSound = new Audio('https://www.soundjay.com/buttons/sounds/beep-01a.mp3');
+    const beepSound = new Audio('sounds/beep.mp3');
+    const fanfareSound = new Audio('sounds/beep2.mp3');
 
     let isAppLaunched = false;
 
@@ -531,13 +546,16 @@
                 }
             }
             showInstruction();
+            logEvent(analytics, 'app_start', {
+                timestamp: Date.now()
+            });
         } catch (error) {        }
     };
 
     const showInstruction = () => {
         let countdown = START_COUNT;
 
-        document.body.style.backgroundImage = 'url("assets/boy2.png")'
+        document.body.style.backgroundImage = 'url("images/boy2.png")'
 
         app.innerHTML = `
         <ol class="instruction-text text">
@@ -565,12 +583,12 @@
 
     const updateMeasurementDisplay = () => {
         app.innerHTML = `
-<img src="assets/heart.png" alt="Background" class="background-image">
+<img src="images/heart.png" alt="Background" class="background-image">
         <div class="heart-rate">
             <p class="heart-rate-text text">In process... <span class="heart-rate-number text">9</span></p>
             <p class="heart-rate-value text">--</p>
             <div class="bmp">
-                <img src="assets/heart.svg" alt="heart" class="bmp-logo">
+                <img src="images/heart.svg" alt="heart" class="bmp-logo">
                 <p class="bmp-text text">bmp</p>
             </div>
         </div>
@@ -690,12 +708,17 @@
         window.removeEventListener('devicemotion', handleMotion);
         measurementStarted = false;
         fanfareSound.play();
+        logEvent(analytics, 'measurement_complete', {
+            bpm: calculateBPM(),
+            timestamp: Date.now()
+        });
+
         app.innerHTML = `
         <div class="heart-rate">
             <p class="heart-rate-text heart-rate-text_completed text">Completed.</p>
             <p class="heart-rate-value text">${calculateBPM()} </p>
             <div class="bmp">
-                <img src="assets/heart.svg" alt="heart" class="bmp-logo">
+                <img src="images/heart.svg" alt="heart" class="bmp-logo">
                 <p class="bmp-text text">bmp</p>
             </div>
         </div>
@@ -704,22 +727,22 @@
       to all benefits</p>
     <div class="benefits-list">
       <div class="benefits-item">
-<img src="assets/ok.svg" alt="ok">
+<img src="images/ok.svg" alt="ok">
         <span class="benefits-item-text text">Unlimited heart rate measurements</span>
       </div>
       <div class="benefits-item">
-<img src="assets/ok.svg" alt="ok">
+<img src="images/ok.svg" alt="ok">
         <span class="benefits-item-text text">Detects critical heart abnormalities</span>
       </div>
       <div class="benefits-item">
-<img src="assets/ok.svg" alt="ok">
+<img src="images/ok.svg" alt="ok">
         <span class="benefits-item-text text">Cardiac cycle duration recorded</span>
       </div>
     </div>
     <div class="pop-up-background"></div>
     <div class="pop-up pop-up-benefit">
       <div class="info">
-        <div class="info-logo"><img src="assets/logo.svg" alt="logo"></div>
+        <div class="info-logo"><img src="images/logo.svg" alt="logo"></div>
         <div class="info-text">
           <p class="info-subtitle">App Store</p>
           <p class="info-title">Heart Scan</p>
@@ -727,7 +750,7 @@
         </div>
       </div>
       <div class="action">
-        <button class="action-button" type="button">Get</button>
+        <button class="action-button" type="button" onclick="ExitApi.exit('https://apps.apple.com/us/app/heartscan-heart-rate-monitor/id1639306601')">Get</button>
         <p class="action-info">In-App Purchases</p>
       </div>
     </div>
@@ -750,7 +773,7 @@
         <div class="pop-up-background"></div>
         <div class="pop-up">
             <div class="info">
-                <div class="info-logo"><img src="assets/logo.svg" alt="logo"></div>
+                <div class="info-logo"><img src="images/logo.svg" alt="logo"></div>
                 <div class="info-text">
                     <p class="info-subtitle">App Store</p>
                     <p class="info-title">Heart Scan</p>
@@ -758,7 +781,7 @@
                 </div>
             </div>
             <div class="action">
-                <button class="action-button" type="button">Get</button>
+                <button class="action-button" type="button" onclick="ExitApi.exit('https://apps.apple.com/us/app/heartscan-heart-rate-monitor/id1639306601')">Get</button>
                 <p class="action-info">In-App Purchases</p>
             </div>
         </div>`;
@@ -772,7 +795,6 @@
             }, 10);
         }
     };
-
 
     setTimeout(checkAppLaunch, TIMER_DURATION);
 
